@@ -18,6 +18,7 @@
 
 #include "buffer/replacer.h"
 #include "common/config.h"
+#include "common/logger.h"
 
 namespace bustub {
 
@@ -46,7 +47,12 @@ class ClockReplacer : public Replacer {
   size_t Size() override;
 
  private:
-  // TODO(student): implement me!
+  std::vector<bool> in_CR_;     // is the frame currently in the ClockReplacer?
+  std::vector<bool> ref_flag_;  // has this frame recently been unpinned?
+  size_t size_;                 // size of the ClockReplacer
+  size_t max_size_;             // maximum size of the ClockReplacer
+  std::mutex latch_;            // mutex for critial section
+  size_t clock_hand_;
 };
 
 }  // namespace bustub

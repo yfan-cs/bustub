@@ -16,7 +16,7 @@
 #include <mutex>  // NOLINT
 #include <unordered_map>
 
-#include "buffer/lru_replacer.h"
+#include "buffer/clock_replacer.h"
 #include "recovery/log_manager.h"
 #include "storage/disk/disk_manager.h"
 #include "storage/page/page.h"
@@ -170,3 +170,4 @@ class BufferPoolManager {
   std::mutex latch_;
 };
 }  // namespace bustub
+
