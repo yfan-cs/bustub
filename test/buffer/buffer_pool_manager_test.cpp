@@ -70,7 +70,6 @@ TEST(BufferPoolManagerTest, BinaryDataTest) {
   }
   for (int i = 0; i < 5; ++i) {
     EXPECT_NE(nullptr, bpm->NewPage(&page_id_temp));
-    printf("new page id: %d\n", page_id_temp);
     bpm->UnpinPage(page_id_temp, false);
   }
   // Scenario: We should be able to fetch the data we wrote a while ago.
@@ -133,7 +132,6 @@ TEST(BufferPoolManagerTest, SampleTest) {
   // now be pinned. Fetching page 0 should fail.
   EXPECT_EQ(true, bpm->UnpinPage(0, true));
   EXPECT_NE(nullptr, bpm->NewPage(&page_id_temp));
-  printf("Before 137!\n");
   EXPECT_EQ(nullptr, bpm->FetchPage(0));
 
   // Shutdown the disk manager and remove the temporary file we created.

@@ -185,10 +185,52 @@ bool BufferPoolManager::DeletePageImpl(page_id_t page_id) {
   // 1.   If P does not exist, return true.
   // 2.   If P exists, but has a non-zero pin-count, return false. Someone is using the page.
   // 3.   Otherwise, P can be deleted. Remove P from the page table, reset its metadata and return it to the free list.
-  return false;
+  latch_.lock();
+
+  // first, check if the page_id in page_table_
+  if (page_table_.find(page_id) == page_table_.end()) {
+    latch_.unlock();
+    return true;
+  }
+
+  frame_id_t frame_id = page_table_[page_id];
+  Page *page = &pages_[frame_id];
+  if (page->pin_count_ > 0) {
+    latch_.unlock();
+    return false;
+  }
+  page_table_.erase(page_id);
+  page->ResetMemory();
+  page->page_id_ = INVALID_PAGE_ID;
+  page->pin_count_ = 0;
+  page->is_dirty_ = false;
+  free_list_.push_back(frame_id);
+  replacer_->Pin(frame_id);
+  latch_.unlock();
+
+  disk_manager_->DeallocatePage(page_id);
+
+  return true;
 }
 
 void BufferPoolManager::FlushAllPagesImpl() {
+  for (size_t i = 0; i < pool_size_; ++i) {
+    Page *page = &pages_[i];
+    if (page->GetPageId() != INVALID_PAGE_ID && page->IsDirty())
+      disk_manager_->WritePage(page->GetPageId(), page->GetData());
+    page->ResetMemory();
+    page->page_id_ = INVALID_PAGE_ID;
+    page->pin_count_ = 0;
+    page->is_dirty_ = false;
+    replacer_->Pin(i);
+  }
+  latch_.lock();
+  page_table_.clear();
+  free_list_.clear();
+  for (size_t i = 0; i < pool_size_; ++i) {
+    free_list_.emplace_back(static_cast<int>(i));
+  }
+  latch_.unlock();
 }
 
 }  // namespace bustub
