@@ -90,11 +90,11 @@ class HashTableHeaderPage {
   size_t NumBlocks();
 
  private:
-  __attribute__((unused)) lsn_t lsn_;
-  __attribute__((unused)) size_t size_;
-  __attribute__((unused)) page_id_t page_id_;
-  __attribute__((unused)) size_t next_ind_;
-  __attribute__((unused)) page_id_t block_page_ids_[0];
+  lsn_t lsn_;
+  size_t size_;                    // number of key&value pairs the hash table can hold
+  page_id_t page_id_;              // self page id
+  size_t next_ind_;                // the next index to add a new entry to block_page_ids_
+  page_id_t block_page_ids_[0];    // see http://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
 };
 
 }  // namespace bustub
