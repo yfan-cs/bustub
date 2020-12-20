@@ -89,6 +89,7 @@ class LinearProbeHashTable : public HashTable<KeyType, ValueType, KeyComparator>
  private:
   // member variable
   page_id_t header_page_id_;
+  HashTableHeaderPage *header_page_;
   BufferPoolManager *buffer_pool_manager_;
   KeyComparator comparator_;
 
