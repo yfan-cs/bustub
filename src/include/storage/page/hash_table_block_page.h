@@ -65,7 +65,7 @@ class HashTableBlockPage {
    * @param key key to insert
    * @param value value to insert
    * @return If the value is inserted successfully, it returns true. If the
-   * index is marked as occupied before the key and value can be inserted,
+   * index is marked as readable before the key and value can be inserted,
    * Insert returns false.
    */
   bool Insert(slot_offset_t bucket_ind, const KeyType &key, const ValueType &value);

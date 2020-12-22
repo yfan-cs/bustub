@@ -77,14 +77,24 @@ class Catalog {
    */
   TableMetadata *CreateTable(Transaction *txn, const std::string &table_name, const Schema &schema) {
     BUSTUB_ASSERT(names_.count(table_name) == 0, "Table names should be unique!");
+    names_[table_name] = next_table_oid_;
+    tables_[next_table_oid_++] = std::unique_ptr<TableMetadata> (new TableMetadata(schema, table_name, nullptr, next_table_oid_));
     return nullptr;
   }
 
   /** @return table metadata by name */
-  TableMetadata *GetTable(const std::string &table_name) { return nullptr; }
+  TableMetadata *GetTable(const std::string &table_name) {
+    if (names_.find(table_name) == names_.end())
+      throw std::out_of_range("Table shouldn't exist yet");
+    return tables_[names_[table_name]].get(); 
+  }
 
   /** @return table metadata by oid */
-  TableMetadata *GetTable(table_oid_t table_oid) { return nullptr; }
+  TableMetadata *GetTable(table_oid_t table_oid) {
+    if (tables_.find(table_oid) == tables_.end())
+      return nullptr;
+    return tables_[table_oid].get(); 
+  }
 
   /**
    * Create a new index, populate existing data of the table and return its metadata.
