@@ -140,8 +140,9 @@ class ExecutorTest : public ::testing::Test {
 };
 
 // NOLINTNEXTLINE
-TEST_F(ExecutorTest, DISABLED_SimpleSeqScanTest) {
+TEST_F(ExecutorTest, SimpleSeqScanTest) {
   // SELECT colA, colB FROM test_1 WHERE colA < 500
+  std::cout << "Hello in SimpleSeqScanTest!" << std::endl;
 
   // Construct query plan
   TableMetadata *table_info = GetExecutorContext()->GetCatalog()->GetTable("test_1");
@@ -169,18 +170,21 @@ TEST_F(ExecutorTest, DISABLED_SimpleSeqScanTest) {
 }
 
 // NOLINTNEXTLINE
-TEST_F(ExecutorTest, DISABLED_SimpleRawInsertTest) {
+TEST_F(ExecutorTest, SimpleRawInsertTest) {
   // INSERT INTO empty_table2 VALUES (100, 10), (101, 11), (102, 12)
   // Create Values to insert
+  std::cout << "I am in SimpleRawInsertTest" << std::endl;
   std::vector<Value> val1{ValueFactory::GetIntegerValue(100), ValueFactory::GetIntegerValue(10)};
   std::vector<Value> val2{ValueFactory::GetIntegerValue(101), ValueFactory::GetIntegerValue(11)};
   std::vector<Value> val3{ValueFactory::GetIntegerValue(102), ValueFactory::GetIntegerValue(12)};
   std::vector<std::vector<Value>> raw_vals{val1, val2, val3};
   // Create insert plan node
   auto table_info = GetExecutorContext()->GetCatalog()->GetTable("empty_table2");
+  std::cout << "after table_info" << std::endl;
   InsertPlanNode insert_plan{std::move(raw_vals), table_info->oid_};
 
   GetExecutionEngine()->Execute(&insert_plan, nullptr, GetTxn(), GetExecutorContext());
+  std::cout << "after execute" << std::endl;
 
   // Iterate through table make sure that values were inserted.
   // SELECT * FROM empty_table2;
@@ -214,7 +218,8 @@ TEST_F(ExecutorTest, DISABLED_SimpleRawInsertTest) {
 }
 
 // NOLINTNEXTLINE
-TEST_F(ExecutorTest, DISABLED_SimpleSelectInsertTest) {
+TEST_F(ExecutorTest, SimpleSelectInsertTest) {
+  std::cout << "begin simple select insert test" << std::endl;
   // INSERT INTO empty_table2 SELECT colA, colB FROM test_1 WHERE colA < 500
   std::unique_ptr<AbstractPlanNode> scan_plan1;
   const Schema *out_schema1;
@@ -233,7 +238,9 @@ TEST_F(ExecutorTest, DISABLED_SimpleSelectInsertTest) {
     auto table_info = GetExecutorContext()->GetCatalog()->GetTable("empty_table2");
     insert_plan = std::make_unique<InsertPlanNode>(scan_plan1.get(), table_info->oid_);
   }
+  std::cout << "before execute in simple select insert test" << std::endl;
   GetExecutionEngine()->Execute(insert_plan.get(), nullptr, GetTxn(), GetExecutorContext());
+  std::cout << "after execute in simple select insert test" << std::endl;
 
   // Now iterate through both tables, and make sure they have the same data
   std::unique_ptr<AbstractPlanNode> scan_plan2;

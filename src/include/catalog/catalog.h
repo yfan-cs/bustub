@@ -78,8 +78,8 @@ class Catalog {
   TableMetadata *CreateTable(Transaction *txn, const std::string &table_name, const Schema &schema) {
     BUSTUB_ASSERT(names_.count(table_name) == 0, "Table names should be unique!");
     names_[table_name] = next_table_oid_;
-    tables_[next_table_oid_++] = std::unique_ptr<TableMetadata> (new TableMetadata(schema, table_name, nullptr, next_table_oid_));
-    return nullptr;
+    tables_[next_table_oid_] = std::make_unique<TableMetadata> (schema, table_name, std::make_unique<TableHeap>(bpm_, lock_manager_, log_manager_, txn), next_table_oid_);
+    return tables_[next_table_oid_++].get();
   }
 
   /** @return table metadata by name */
@@ -92,7 +92,7 @@ class Catalog {
   /** @return table metadata by oid */
   TableMetadata *GetTable(table_oid_t table_oid) {
     if (tables_.find(table_oid) == tables_.end())
-      return nullptr;
+      throw std::out_of_range("Table shouldn't exist yet");
     return tables_[table_oid].get(); 
   }
 
